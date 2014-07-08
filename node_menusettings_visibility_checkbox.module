@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function node_menusettings_visibility_checkbox_form_alter(&$form, $form_state, $form_id) {
+
+  if(preg_match('/_node_form$/', $form_id) == 1) {
+
+      $form['menu']['enabled']['#ajax'] = array('callback' => 'node_menusettings_visibility_checkbox_show_hide');
+
+      $mlid = 0;
+      if(isset( $form['menu']['link']['mlid']['#value']) && $form['menu']['link']['mlid']['#value'] > 0 ){
+        $mlid = $form['menu']['link']['mlid']['#value'];
+        $menuItem = menu_link_load($mlid);
+      }
+
+      $form['menu']['mitem_enabled'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enabled'),
+        '#default_value' => (($mlid == 0) ? 1 : ($menuItem['hidden'] == 0) ? 1 : 0),
+        '#description' => t('Menu items that are not enabled will not be listed in any menu.'),
+        '#weight' => 0
+      );
+
+      array_unshift($form['#submit'],'node_menusettings_visibility_checkbox_submit');
+
+      drupal_add_js(node_menusettings_visibility_checkbox_init_js(),'inline');
+  }
+}
+
+/**
+ * Custom submit handler.
+ */
+function node_menusettings_visibility_checkbox_submit(&$form, $form_state) {
+  $_SESSION['mitemenabled'] = $form['menu']['mitem_enabled']['#value'];
+}
+
+/**
+ * Implementation of hook_node_presave().
+ */
+function node_menusettings_visibility_checkbox_node_presave($node) {
+  if(($node->menu['enabled'] == 1) && isset($_SESSION['mitemenabled'])) {
+    if($_SESSION['mitemenabled'] == 1) {
+      $node->menu['hidden'] = 0;
+    } else {
+      $node->menu['hidden'] = 1;
+    }
+    unset($_SESSION['mitemenabled']);
+  }
+}
+
+/**
+ * Ajax callback. Show/hides mitem_enabled checkbox.
+ */
+function node_menusettings_visibility_checkbox_show_hide(&$form, $form_state) {
+  $commands = array();
+  $commands[] = ajax_command_invoke('.form-item-menu-mitem-enabled', 'toggle');
+  return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+/**
+ * Show/hide mitem_enabled checkbox on page ready depending on enabled item checkbox
+ */
+function node_menusettings_visibility_checkbox_init_js() {
+
+  $js = '
+  jQuery( document ).ready(function() {
+    if(jQuery("#edit-menu-enabled").is(":checked")) {
+      jQuery(".form-item-menu-mitem-enabled").show();
+    } else {
+      jQuery(".form-item-menu-mitem-enabled").hide();
+    }
+  });
+  ';
+
+  return $js;
+}

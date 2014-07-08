@@ -1,0 +1,5 @@
+name = Node menu settings visibility checkbox
+description = Adds menu enabled checkbox to the Menu settings tab in node editing form. 
+version = "7.x-1.0"
+core = "7.x"
+package = General
