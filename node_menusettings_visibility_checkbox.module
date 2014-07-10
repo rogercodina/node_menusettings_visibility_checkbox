@@ -17,9 +17,8 @@ function node_menusettings_visibility_checkbox_form_alter(&$form, $form_state, $
 
       $form['menu']['mitem_enabled'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Enabled'),
+        '#title' => t('Show in menu'),
         '#default_value' => (($mlid == 0) ? 1 : ($menuItem['hidden'] == 0) ? 1 : 0),
-        '#description' => t('Menu items that are not enabled will not be listed in any menu.'),
         '#weight' => 0
       );
 
