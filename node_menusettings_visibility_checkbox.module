@@ -39,7 +39,7 @@ function node_menusettings_visibility_checkbox_submit(&$form, $form_state) {
  * Implementation of hook_node_presave().
  */
 function node_menusettings_visibility_checkbox_node_presave($node) {
-  if(($node->menu['enabled'] == 1) && isset($_SESSION['mitemenabled'])) {
+  if(isset($node->menu['enabled']) && ($node->menu['enabled'] == 1) && isset($_SESSION['mitemenabled'])) {
     if($_SESSION['mitemenabled'] == 1) {
       $node->menu['hidden'] = 0;
     } else {
