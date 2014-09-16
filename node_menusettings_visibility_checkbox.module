@@ -5,7 +5,7 @@
  */
 function node_menusettings_visibility_checkbox_form_alter(&$form, $form_state, $form_id) {
 
-  if(preg_match('/_node_form$/', $form_id) == 1) {
+  if(preg_match('/_node_form$/', $form_id) == 1 && isset($form['menu'])) {
 
       $form['menu']['enabled']['#ajax'] = array('callback' => 'node_menusettings_visibility_checkbox_show_hide');
 
